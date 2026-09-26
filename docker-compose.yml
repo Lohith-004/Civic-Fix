@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: civicfix-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - DATABASE_URL=postgresql://civicfix:civicfix_secret@postgres:5432/civicfix_db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: civicfix-fastapi
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://civicfix:civicfix_secret@postgres:5432/civicfix_db
+      - REDIS_URL=redis://redis:6379/0
+      - AI_API_KEY=${GEMINI_API_KEY:-}
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: civicfix-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: civicfix
+      POSTGRES_PASSWORD: civicfix_secret
+      POSTGRES_DB: civicfix_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: civicfix-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:

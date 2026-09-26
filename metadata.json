@@ -1,0 +1,6 @@
+{
+  "name": "CivicFix",
+  "description": "AI-powered civic issue reporting and resolution platform connecting citizens, government departments, field officers, supervisors, managers, and administrators.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
